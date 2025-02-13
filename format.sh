@@ -19,7 +19,7 @@ devices=($(lsblk -J -o NAME,SIZE,ROTA,TYPE,MODEL,MOUNTPOINTS | jq -r '.blockdevi
 
 for i in ${!devices[@]} 
 do 
-    sudo mkdir /mnt/minio-data${i}
-    sudo mkfs.xfs -f -L minio-data${i} /dev/${devices[i]}
-    echo "LABEL=minio-data${i} /mnt/minio-data${i}  xfs     defaults,noatime        0 0"
+    sudo mkdir -p /mnt/minio-data$((i+1))
+    sudo mkfs.xfs -f -L minio-data$((i+1)) /dev/${devices[i]}
+    echo "LABEL=minio-data$((i+1)) /mnt/minio-data$((i+1))  xfs     defaults,noatime        0 0"
 done
