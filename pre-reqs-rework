@@ -7,7 +7,7 @@ echo "Before running this script, you need to set up passwordless ssh to all nod
 
 # Install ancillary packages 
 #sudo apt install clustershell git prometheus prometheus-process-exporter prometheus-node-exporter
-clush -l ubuntu --hostfile /home/$USER/minio-nodes sudo apt install sysstat iperf tmux jq -y
+clush -l ubuntu --hostfile /home/$USER/minio-nodes sudo apt install sysstat iperf tmux jq prometheus-node-exporter -y
 
 # Create a temp local dir to stage assets
 mkdir /tmp/minio-assets-temp
