@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# Pre-seed data for warp runs using  with GET and --noclear. Total object count created will vary depending on hardware capabilities, you may need to adjust run time accordingly
+# Pre-seed data for warp runs using  with GET and --noclear. 
 
 for op in get ; do
-        for size in  100MiB 10MiB 1MiB 10KiB;  do
+        for size in  100MiB 10MiB 10KiB;  do
                 for conc in 80; do
             flags="--noclear --objects 500000"
 
