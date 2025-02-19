@@ -1,0 +1,62 @@
+#!/bin/bash
+
+# Automate running warp benchmarks
+
+for op in put get stat list delete  ; do
+        for size in  10KiB 10MiB 100MiB ; do
+                for conc in 80; do
+            flags="--noclear"
+            if [ ${op} == "get" ]; then
+                flags="--list-existing --objects 500000 --noclear"
+            elif [ ${op} == "stat" ]; then
+                flags="--objects 500000 --noclear"
+            elif [ ${op} == "list" ]; then
+                flags="--list-existing --objects 500000 --noclear"
+            elif [ ${op} == "delete" ]; then
+                flags="--list-existing --objects 500000 --noclear"
+            fi
+
+            echo "Using flags: ${flags}"
+	    mc admin info minio > mc-admin.info
+	    mc admin info minio --json > mc-admin.json
+	    mc admin prometheus metrics minio system --api-version v3 > objsize${size}threads${conc}-${op}-$(date +%y-%m-%d-%I-%M)-cache-metrics-before
+        warp ${op} --warp-client=192.168.100.1{81...84}   \
+                 --bucket warp-bench \
+                 --prefix objsize-${size}-threads-${conc}/ \
+                 --obj.generator random \
+                 --region us-east-1 \
+                 --access-key=minioadmin \
+                 --secret-key=minioadmin \
+                 --obj.size=${size} \
+                 --concurrent=${conc} \
+                 --duration 5m  \
+		 --benchdata objsize-${size}-threads-${conc}-${op}-$(date +%y-%m-%d-%I-%M) \
+		 ${flags} | tee objsize${size}-threads${conc}-${op}-$(date +%y-%m-%d-%I-%M).log
+
+        done;
+    done;
+  done
+
+#for op in delete; do
+#        for size in  10KiB 1MiB 100MiB ; do
+#                for conc in 80; do
+#            flags="--objects 2500000" 
+
+#           echo "Using flags: ${flags}"
+#           echo -e  "Getting v3 system metrics before:\n"
+#        warp ${op} --warp-client=192.168.100.1{81...84}   \
+#                 --bucket warp-bench \
+#                 --prefix delete-objsize-${size}-threads-${conc}/ \
+#                 --obj.generator random \
+#                 --region us-east-1 \
+#                 --access-key=minioadmin \
+#                 --secret-key=minioadmin \
+#                 --obj.size=${size} \
+#                 --concurrent=${conc} \
+#                 --benchdata objsize-${size}-threads-${conc}-${op}-$(date +%y-%m-%d-%I-%M) \
+#                ${flags} | tee objsize${size}-threads${conc}-${op}-$(date +%y-%m-%d-%I-%M).log
+
+#	 done;
+# done;
+#done;
+
