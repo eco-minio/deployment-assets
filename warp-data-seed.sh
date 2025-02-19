@@ -5,7 +5,7 @@
 for op in get ; do
         for size in  100MiB 10MiB 1MiB 10KiB;  do
                 for conc in 80; do
-            flags="--noclear --objects 100000"
+            flags="--noclear --objects 500000"
 
             echo "Using flags: ${flags}";
         warp ${op} --warp-client=minio{1...4}   \
@@ -18,8 +18,8 @@ for op in get ; do
                  --obj.size=${size} \
                  --concurrent=${conc} \
                  --duration 10s \
-                 --benchdata objsize-${size}-threads-${conc}-${op} \
-                 ${flags} | tee objSize${size}-threads-${conc}-${op}.log
+                 --benchdata obj-data-seed-${size}-threads-${conc}-${op} \
+                 ${flags} | tee obj-data-seed${size}-threads-${conc}-${op}.log
 
         done;
     done;
