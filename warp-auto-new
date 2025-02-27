@@ -7,13 +7,13 @@ for op in put get stat list delete  ; do
                 for conc in 80; do
             flags="--noclear"
             if [ ${op} == "get" ]; then
-                flags="--list-existing --objects 500000 --noclear"
+                flags="--list-existing --objects 150000 --noclear"
             elif [ ${op} == "stat" ]; then
-                flags="--objects 500000 --noclear"
+                flags="--list-existing --objects 150000 --noclear"
             elif [ ${op} == "list" ]; then
-                flags="--list-existing --objects 500000 --noclear"
+                flags="--objects 150000 --noclear"
             elif [ ${op} == "delete" ]; then
-                flags="--list-existing --objects 500000 --noclear"
+                flags="--list-existing --objects 150000 --noclear"
             fi
 
             echo "Using flags: ${flags}"
@@ -40,7 +40,7 @@ for op in put get stat list delete  ; do
 #for op in delete; do
 #        for size in  10KiB 1MiB 100MiB ; do
 #                for conc in 80; do
-#            flags="--objects 2500000" 
+#            flags="--objects 2150000" 
 
 #           echo "Using flags: ${flags}"
 #           echo -e  "Getting v3 system metrics before:\n"
