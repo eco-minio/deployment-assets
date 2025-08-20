@@ -2,21 +2,20 @@
 
 # Automate running warp benchmarks
 
-for op in put get stat list delete  ; do
-        for size in  10KiB 10MiB 100MiB ; do
+for op in put get stat delete  ; do
+        for size in  4KiB 64KiB 4MiB 64MiB ; do
                 for conc in 80; do
             flags="--noclear"
             if [ ${op} == "get" ]; then
                 flags="--list-existing --objects 150000 --noclear"
             elif [ ${op} == "stat" ]; then
                 flags="--list-existing --objects 150000 --noclear"
-            elif [ ${op} == "list" ]; then
-                flags="--objects 150000 --noclear"
             elif [ ${op} == "delete" ]; then
                 flags="--list-existing --objects 150000 --noclear"
             fi
 
-            echo "Using flags: ${flags}"
+	    
+            echo "Running ${op} test with concurrency ${conc} and  object size ${size} using flags: ${flags}"
 	    mc admin info minio > mc-admin.info
 	    mc admin info minio --json > mc-admin.json
 	    mc admin prometheus metrics minio system --api-version v3 > objsize${size}threads${conc}-${op}-$(date +%y-%m-%d-%I-%M)-cache-metrics-before
@@ -37,26 +36,17 @@ for op in put get stat list delete  ; do
     done;
   done
 
-#for op in delete; do
-#        for size in  10KiB 1MiB 100MiB ; do
-#                for conc in 80; do
-#            flags="--objects 2150000" 
 
-#           echo "Using flags: ${flags}"
-#           echo -e  "Getting v3 system metrics before:\n"
-#        warp ${op} --warp-client=192.168.100.1{81...84}   \
-#                 --bucket warp-bench \
-#                 --prefix delete-objsize-${size}-threads-${conc}/ \
-#                 --obj.generator random \
-#                 --region us-east-1 \
-#                 --access-key=minioadmin \
-#                 --secret-key=minioadmin \
-#                 --obj.size=${size} \
-#                 --concurrent=${conc} \
-#                 --benchdata objsize-${size}-threads-${conc}-${op}-$(date +%y-%m-%d-%I-%M) \
-#                ${flags} | tee objsize${size}-threads${conc}-${op}-$(date +%y-%m-%d-%I-%M).log
-
-#	 done;
-# done;
-#done;
-
+# Break list performance testing out on itself since it behaves somewhat differently than other verbs
+for conc in 80; do
+warp list --warp-client=192.168.100.1{81...84}   \
+                 --bucket warp-bench \
+                 --prefix objsize-10KiB-threads-${conc}/ \
+                 --obj.generator random \
+                 --region us-east-1 \
+                 --access-key=minioadmin \
+                 --secret-key=minioadmin \
+                 --concurrent=${conc} \
+                 --duration 5m  \
+                 --benchdata objsize-10KiB-threads-${conc}-list-$(date +%y-%m-%d-%I-%M) \
+                 ${flags} | tee objsize-10KiB-threads-${conc}-list-$(date +%y-%m-%d-%I-%M).log
